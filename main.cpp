@@ -19,6 +19,12 @@ struct AdressData
     string  email;
 };
 
+struct Uzytkownik
+{
+    int id;
+    string nazwa, haslo;
+};
+
 char loadSign()
 {
     string inputText = "";
@@ -60,6 +66,85 @@ int loadIntegerNumber()
         cout << "To nie jest liczba. Wpisz ponownie. " << endl;
     }
     return number;
+}
+
+int rejestracja(Uzytkownik users[],int usersCount)
+{
+    string nazwa, haslo;
+    cout << "Podaj nazwe uzytkownika: ";
+    nazwa=loadLineOfText();
+    int i=0;
+    while(i < usersCount)
+    {
+        if(users[i].nazwa == nazwa)
+        {
+            cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
+            nazwa=loadLineOfText();
+            i = 0;
+        }
+        else
+        {
+            i++;
+        }
+    }
+    cout << "Podaj haslo: ";
+    haslo=loadLineOfText();
+    users[usersCount].nazwa=nazwa;
+    users[usersCount].haslo=haslo;
+    users[usersCount].id=usersCount+1;
+    cout << "Konto zalozone." << endl;
+    Sleep(1000);
+
+    return usersCount+1;
+}
+
+int logowanie(Uzytkownik uzytkownicy[],int iloscUzytkownikow)
+{
+    string nazwa, haslo;
+    cout << "Podaj nazwe uzytkownika: ";
+    nazwa=loadLineOfText();
+    int i=0;
+    while(i < iloscUzytkownikow)
+    {
+        if(uzytkownicy[i].nazwa == nazwa)
+        {
+            for(int proby=0; proby<3; proby++)
+            {
+                cout << "Podaj haslo. Pozostalo prob " << 3-proby << ":";
+                haslo=loadLineOfText();
+                if(uzytkownicy[i].haslo==haslo)
+                {
+                    cout << "Zalogowales sie.";
+                    Sleep(1000);
+                    return uzytkownicy[i].id;
+                }
+            }
+            cout << "Podales 3 razy bledne haslo. Poczekaj 3 sekundy przed kolejna proba.";
+            Sleep(3000);
+            return 0;
+        }
+        i++;
+    }
+    cout << "Nie ma uzytkownika z takim loginem";
+    Sleep(1500);
+    return 0;
+}
+
+void zmianaHasla(Uzytkownik uzytkownicy[],int iloscUzytkownikow,int idZalogowanegoUzytkownika)
+{
+    string haslo;
+    cout << "Podaj haslo:";
+    haslo=loadLineOfText();
+
+    for(int i=0; i<iloscUzytkownikow; i++)
+    {
+        if(uzytkownicy[i].id == idZalogowanegoUzytkownika)
+        {
+            uzytkownicy[i].haslo = haslo;
+            cout << "Haslo zostalo zmienione." << endl;
+            Sleep(1500);
+        }
+    }
 }
 
 void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee)
@@ -375,105 +460,142 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
 
 int main()
 {
-
-    int id;
     vector <AdressData> listOfAddresse;
+    Uzytkownik uzytkownicy[100];
+    int idZalogowanegoUzytkownika=0;
+    int iloscUzytkownikow=0;
 
+    char wybor;
+    char menuItemSelection = '0';
 
     string surname, name;
-
-    char menuItemSelection = '0';
 
     readFromTxtFile(listOfAddresse);
 
     while(1)
     {
-        switch(menuItemSelection)
-        {
-        case '0':
+
+        if(idZalogowanegoUzytkownika==0)
         {
             system("cls");
-            cout << "KSIAZKA ADRESOWA\n";
-            cout << "1. Dodaj adresata."  << endl;
-            cout << "2. Wyszukaj po imieniu."      << endl;
-            cout << "3. Wyszukaj po nazwisku."    << endl;
-            cout << "4. Wyswietl wszystkich adresatow."  << endl;
-            cout << "5. Usun adresata."      << endl;
-            cout << "6. Edytuj adresata."    << endl;
-            cout << "9. Zakoncz program."    << endl;
-            cout << "Twoj wybor:"    << endl;
+            cout << "1. Rejestracja" << endl;
+            cout << "2. Logowanie" << endl;
+            cout << "9. Zakoncz program" << endl;
+            wybor=loadSign();
 
-            menuItemSelection=loadSign();
+            if(wybor == '1')
+            {
+                iloscUzytkownikow = rejestracja(uzytkownicy,iloscUzytkownikow);
+            }
+            else if(wybor == '2')
+            {
+                idZalogowanegoUzytkownika = logowanie(uzytkownicy,iloscUzytkownikow);
+            }
+            else if(wybor == '9')
+            {
+                cout<<"Wcisnij enter, aby zamknac program...";
+                cin.get();
+                exit(0);
+            }
+
         }
-        break;
-
-        case '1':
+        else
         {
-            enterTheAddresseeDetails(listOfAddresse);
-            saveToTxtFile(listOfAddresse);
-            menuItemSelection = '0';
-        }
-        break;
+            switch(menuItemSelection)
+            {
+            case '0':
+            {
+                system("cls");
+                cout << "KSIAZKA ADRESOWA\n";
+                cout << "1. Dodaj adresata."  << endl;
+                cout << "2. Wyszukaj po imieniu."      << endl;
+                cout << "3. Wyszukaj po nazwisku."    << endl;
+                cout << "4. Wyswietl wszystkich adresatow."  << endl;
+                cout << "5. Usun adresata."      << endl;
+                cout << "6. Edytuj adresata."    << endl;
+                cout << "7. Zmiana hasla" << endl;
+                cout << "8. Wylogowanie" << endl;
+                cout << "Twoj wybor:"    << endl;
 
-        case '2':
-        {
-            searchTheAddresseeByName(listOfAddresse);
-            menuItemSelection = '0';
-        }
-        break;
+                menuItemSelection=loadSign();
+            }
+            break;
 
-        case '3':
-        {
-            searchTheAddresseeBySurname(listOfAddresse);
-            menuItemSelection = '0';
-        }
-        break;
+            case '1':
+            {
+                enterTheAddresseeDetails(listOfAddresse);
+                saveToTxtFile(listOfAddresse);
+                menuItemSelection = '0';
+            }
+            break;
 
-        case '4':
-        {
-            printingTheVector(listOfAddresse);
-            cout << "Aby wyjsc do menu wcisnij dowolny klawisz oraz potwierdzajac klawisz 'ENTER'!"<<endl;
-            loadSign();
-            menuItemSelection = '0';
-        }
-        break;
+            case '2':
+            {
+                searchTheAddresseeByName(listOfAddresse);
+                menuItemSelection = '0';
+            }
+            break;
 
-        case '5':
-        {
-            displayAdresseesId(listOfAddresse);
-            eraseAdressee(listOfAddresse);
-            saveToTxtFile(listOfAddresse);
-            menuItemSelection = '0';
-        }
-        break;
+            case '3':
+            {
+                searchTheAddresseeBySurname(listOfAddresse);
+                menuItemSelection = '0';
+            }
+            break;
 
-        case '6':
-        {
-            displayAdresseesId(listOfAddresse);
-            editAddressee(listOfAddresse);
-            saveToTxtFile(listOfAddresse);
-            menuItemSelection = '0';
+            case '4':
+            {
+                printingTheVector(listOfAddresse);
+                cout << "Aby wyjsc do menu wcisnij dowolny klawisz oraz potwierdzajac klawisz 'ENTER'!"<<endl;
+                loadSign();
+                menuItemSelection = '0';
+            }
+            break;
 
-        }
-        break;
+            case '5':
+            {
+                displayAdresseesId(listOfAddresse);
+                eraseAdressee(listOfAddresse);
+                saveToTxtFile(listOfAddresse);
+                menuItemSelection = '0';
+            }
+            break;
 
-        case '9':
-        {
-            cout<<"Wcisnij enter, aby zamknac program...";
-            cin.get();
-            exit(0);
-        }
-        break;
+            case '6':
+            {
+                displayAdresseesId(listOfAddresse);
+                editAddressee(listOfAddresse);
+                saveToTxtFile(listOfAddresse);
+                menuItemSelection = '0';
 
-        default: // oznacza blok instrukcji wykonywany dla wszystkich pozosta³ych wartoœci zmienna
-        {
-            cout<<"Wybierz poprawna opcje menu wpisujac poprawna liczbe oraz potwierdzajac klawisz ENTER!";
-            Sleep(2000);
-            menuItemSelection = '0';
-        }
-        break;
+            }
+            break;
 
+            case '7':
+            {
+                zmianaHasla(uzytkownicy,iloscUzytkownikow,idZalogowanegoUzytkownika);
+
+            }
+            break;
+
+            case '8':
+            {
+                idZalogowanegoUzytkownika = 0;
+
+            }
+            break;
+
+            default: // oznacza blok instrukcji wykonywany dla wszystkich pozosta³ych wartoœci zmienna
+            {
+                cout<<"Wybierz poprawna opcje menu wpisujac poprawna liczbe oraz potwierdzajac klawisz ENTER!";
+                Sleep(2000);
+                menuItemSelection = '0';
+            }
+            break;
+
+            }
         }
+
     }
 
     return 0;
