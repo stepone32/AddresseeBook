@@ -12,6 +12,7 @@ using namespace std;
 struct AdressData
 {
     int     idOfAdressee;
+    int     idOfUser;
     string  surname;
     string  name;
     string  phoneNumber;
@@ -19,10 +20,10 @@ struct AdressData
     string  email;
 };
 
-struct Uzytkownik
+struct User
 {
     int id;
-    string nazwa, haslo;
+    string userName, password;
 };
 
 char loadSign()
@@ -68,86 +69,100 @@ int loadIntegerNumber()
     return number;
 }
 
-int rejestracja(Uzytkownik users[],int usersCount)
+int rejestracja(vector<User> &users,int usersCount)
 {
-    string nazwa, haslo;
+    User user;
+    string userName, password;
     cout << "Podaj nazwe uzytkownika: ";
-    nazwa=loadLineOfText();
-    int i=0;
-    while(i < usersCount)
-    {
-        if(users[i].nazwa == nazwa)
+    userName=loadLineOfText();
+
+        if(users.empty())
+       {
+            cout << "Podaj haslo: ";
+            password=loadLineOfText();
+            user.userName=userName;
+            user.password=password;
+            user.id=usersCount+1;
+            users.push_back(user);
+            cout << "Konto zalozone." << endl;
+            Sleep(1000);
+       }
+       else if(!users.empty())
+       {
+
+        for(vector<User>::iterator itr = users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
         {
-            cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
-            nazwa=loadLineOfText();
-            i = 0;
+
+            if(itr->userName == userName)
+            {
+                cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
+                userName=loadLineOfText();
+            }
         }
-        else
-        {
-            i++;
-        }
-    }
-    cout << "Podaj haslo: ";
-    haslo=loadLineOfText();
-    users[usersCount].nazwa=nazwa;
-    users[usersCount].haslo=haslo;
-    users[usersCount].id=usersCount+1;
-    cout << "Konto zalozone." << endl;
-    Sleep(1000);
+            cout << "Podaj haslo: ";
+            password=loadLineOfText();
+            user.userName=userName;
+            user.password=password;
+            user.id=usersCount+1;
+            users.push_back(user);
+            cout << "Konto zalozone." << endl;
+            Sleep(1000);
+       }
 
     return usersCount+1;
 }
 
-int logowanie(Uzytkownik uzytkownicy[],int iloscUzytkownikow)
+int logowanie(vector<User> users)
 {
-    string nazwa, haslo;
+    User userLog;
+    string userName, password;
     cout << "Podaj nazwe uzytkownika: ";
-    nazwa=loadLineOfText();
-    int i=0;
-    while(i < iloscUzytkownikow)
+    userName=loadLineOfText();
+
+    for(vector<User>::iterator itr = users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
     {
-        if(uzytkownicy[i].nazwa == nazwa)
+        if(itr->userName == userName)
         {
             for(int proby=0; proby<3; proby++)
             {
                 cout << "Podaj haslo. Pozostalo prob " << 3-proby << ":";
-                haslo=loadLineOfText();
-                if(uzytkownicy[i].haslo==haslo)
+                password=loadLineOfText();
+                if(itr->password==password)
                 {
                     cout << "Zalogowales sie.";
                     Sleep(1000);
-                    return uzytkownicy[i].id;
+                    return (itr->id);
                 }
             }
             cout << "Podales 3 razy bledne haslo. Poczekaj 3 sekundy przed kolejna proba.";
             Sleep(3000);
             return 0;
         }
-        i++;
     }
+
     cout << "Nie ma uzytkownika z takim loginem";
     Sleep(1500);
     return 0;
 }
 
-void zmianaHasla(Uzytkownik uzytkownicy[],int iloscUzytkownikow,int idZalogowanegoUzytkownika)
+void zmianaHasla(vector<User> &users,int idUser)
 {
-    string haslo;
+    string password;
     cout << "Podaj haslo:";
-    haslo=loadLineOfText();
+    password=loadLineOfText();
 
-    for(int i=0; i<iloscUzytkownikow; i++)
-    {
-        if(uzytkownicy[i].id == idZalogowanegoUzytkownika)
+    for(vector<User>::iterator itr=users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
         {
-            uzytkownicy[i].haslo = haslo;
-            cout << "Haslo zostalo zmienione." << endl;
-            Sleep(1500);
+            if(itr->id==idUser)
+            {
+                itr->password=password;
+                cout << "Haslo zostalo zmienione." << endl;
+                Sleep(1500);
+            }
         }
-    }
 }
 
-void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee)
+void enterTheAddresseeDetails(int idUser, vector <AdressData> &dataOfTheAddressee)
 {
 
     AdressData dataOfAddressee;		// Dane Adresata
@@ -155,29 +170,30 @@ void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee)
         dataOfAddressee = dataOfTheAddressee.back();
     else
         dataOfAddressee.idOfAdressee=0;
-////////////////////////////////////////////////////////////////////
+
     fstream file;
-    file.open("ksiazka_adresowa.txt", ios::in );
+    file.open("Adresaci.txt", ios::in );
 
     if (file.good()==false)
     {
-        cout<<"Nie udalo sie otworzyc pliku 'ksiazka_adresowa.txt'!"<<endl;
+        cout<<"Nie udalo sie otworzyc pliku 'Adresaci.txt'!"<<endl;
         Sleep(3000);
-        file.open("ksiazka_adresowa.txt", ios::out );
+        file.open("Adresaci.txt", ios::out );
         if(file.good()==true)
         {
-            cout<<"Zostal utworzony nowy plik 'ksiazka_adresowa.txt'z baza danych adresatow!"<<endl;
+            cout<<"Zostal utworzony nowy plik 'Adresaci.txt'z baza danych adresatow!"<<endl;
             Sleep(3000);
         }
     }
     if (file.good()==false)
     {
-        cout<<"Nie udalo sie utworzyc pliku ""ksiazka_adresowa.txt""!"<<endl;
+        cout<<"Nie udalo sie utworzyc pliku ""Adresaci.txt""!"<<endl;
         Sleep(3000);
         exit(0);
     }
-///////////////////////////////////////////////////////////////////
+
     dataOfAddressee.idOfAdressee = dataOfAddressee.idOfAdressee + 1;
+    dataOfAddressee.idOfUser = idUser;
     cout<<"Podaj nazwisko adresata: ";
     dataOfAddressee.surname = loadLineOfText();
     cout<<"Podaj imie adresata: ";
@@ -198,16 +214,15 @@ void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee)
 void saveToTxtFile(vector<AdressData> dataOfListAddressee)
 {
     fstream file;
-    file.open("ksiazka_adresowa.txt", ios::out );
+    file.open("Adresaci.txt", ios::out );
 
     for(vector<AdressData>::iterator itr = dataOfListAddressee.begin(), endVectorWord=dataOfListAddressee.end(); itr!=endVectorWord; itr++)
     {
-        file<<itr->idOfAdressee<<'|'<<itr->surname<<'|'<<itr->name<<'|'<<itr->phoneNumber<<'|'<<itr->address<<'|'<<itr->email<<'|'<<'\n';
+        file<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->surname<<'|'<<itr->name<<'|'<<itr->phoneNumber<<'|'<<itr->address<<'|'<<itr->email<<'|'<<'\n';
     }
 
     file.close();
 }
-
 
 void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
 {
@@ -220,7 +235,7 @@ void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
 
     if(file.good()==true)
     {
-        file.open("ksiazka_adresowa.txt", ios::in );
+        file.open("Adresaci.txt", ios::in );
     }
 
     while(getline(file,lineInTxtFile,'|') )
@@ -231,24 +246,27 @@ void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
             dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
             break;
         case 2:
-            dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
             break;
         case 3:
-            dataOfAddresseeFromTxtFile.name = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
             break;
         case 4:
-            dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.name = lineInTxtFile;
             break;
         case 5:
-            dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
             break;
         case 6:
+            dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+            break;
+        case 7:
             dataOfAddresseeFromTxtFile.email = lineInTxtFile;
             break;
         }
 
         ++numberOfTheLineInTxtFile;
-        if(numberOfTheLineInTxtFile==7)
+        if(numberOfTheLineInTxtFile==8)
         {
             numberOfTheLineInTxtFile=1;
             writeToAddresseeList.push_back(dataOfAddresseeFromTxtFile);
@@ -336,7 +354,6 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 {
                 case '0':
                 {
-
                     cout<<"1.Edytuj nazwisko adresata."<<endl;
                     cout<<"2.Edytuj imie adresata."<<endl;
                     cout<<"3.Edytuj numer telefonu adresata."<<endl;
@@ -384,7 +401,7 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 case '6':
                     menuItem= '7';
                     break;
-                default: // oznacza blok instrukcji wykonywany dla wszystkich pozostalych wartosci zmienna
+                default:
                 {
                     cout<<"Wybierz poprawna opcje menu wpisujac poprawna liczbe oraz potwierdzajac klawisz 'ENTER'!";
                     Sleep(2000);
@@ -398,7 +415,6 @@ void editAddressee(vector<AdressData> &AddresseeList)
         }
     }
 }
-
 
 void displayAdresseesId(vector<AdressData> printedVector)
 {
@@ -447,7 +463,7 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
             if(loadSign()=='t')
             {
                 vectorOfDeleteAddresses.erase(itr);
-                cout<< "Uzytkownik o wskazanym id zostal usuniety !"<<endl;
+                cout<< "User o wskazanym id zostal usuniety !"<<endl;
                 Sleep(1500);
             }
             else
@@ -460,9 +476,9 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
 
 int main()
 {
-    vector <AdressData> listOfAddresse;
-    Uzytkownik uzytkownicy[100];
-    int idZalogowanegoUzytkownika=0;
+    vector<AdressData> listOfAddresse;
+    vector<User> users;
+    int idUser=0;
     int iloscUzytkownikow=0;
 
     char wybor;
@@ -475,7 +491,7 @@ int main()
     while(1)
     {
 
-        if(idZalogowanegoUzytkownika==0)
+        if(idUser==0)
         {
             system("cls");
             cout << "1. Rejestracja" << endl;
@@ -485,11 +501,11 @@ int main()
 
             if(wybor == '1')
             {
-                iloscUzytkownikow = rejestracja(uzytkownicy,iloscUzytkownikow);
+                iloscUzytkownikow = rejestracja(users,iloscUzytkownikow);
             }
             else if(wybor == '2')
             {
-                idZalogowanegoUzytkownika = logowanie(uzytkownicy,iloscUzytkownikow);
+                idUser = logowanie(users);
             }
             else if(wybor == '9')
             {
@@ -523,7 +539,7 @@ int main()
 
             case '1':
             {
-                enterTheAddresseeDetails(listOfAddresse);
+                enterTheAddresseeDetails(idUser,listOfAddresse);
                 saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
@@ -567,25 +583,24 @@ int main()
                 editAddressee(listOfAddresse);
                 saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
-
             }
             break;
 
             case '7':
             {
-                zmianaHasla(uzytkownicy,iloscUzytkownikow,idZalogowanegoUzytkownika);
-
+                zmianaHasla(users,idUser);
+                menuItemSelection = '0';
             }
             break;
 
             case '8':
             {
-                idZalogowanegoUzytkownika = 0;
-
+                idUser = 0;
+                menuItemSelection = '0';
             }
             break;
 
-            default: // oznacza blok instrukcji wykonywany dla wszystkich pozosta³ych wartoœci zmienna
+            default:
             {
                 cout<<"Wybierz poprawna opcje menu wpisujac poprawna liczbe oraz potwierdzajac klawisz ENTER!";
                 Sleep(2000);
@@ -595,7 +610,6 @@ int main()
 
             }
         }
-
     }
 
     return 0;
