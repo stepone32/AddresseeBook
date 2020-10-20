@@ -13,8 +13,8 @@ struct AdressData
 {
     int     idOfAdressee;
     int     idOfUser;
-    string  surname;
     string  name;
+    string  surname;
     string  phoneNumber;
     string  address;
     string  email;
@@ -194,16 +194,16 @@ void enterTheAddresseeDetails(int idUser, vector <AdressData> &dataOfTheAddresse
 
     dataOfAddressee.idOfAdressee = dataOfAddressee.idOfAdressee + 1;
     dataOfAddressee.idOfUser = idUser;
-    cout<<"Podaj nazwisko adresata: ";
-    dataOfAddressee.surname = loadLineOfText();
     cout<<"Podaj imie adresata: ";
     dataOfAddressee.name = loadLineOfText();
+    cout<<"Podaj nazwisko adresata: ";
+    dataOfAddressee.surname = loadLineOfText();
     cout<<"Podaj numer telefonu adresata: ";
     dataOfAddressee.phoneNumber = loadLineOfText();
-    cout<<"Podaj adres zamieszakania adresta: ";
-    dataOfAddressee.address = loadLineOfText();
     cout<<"Podaj adres e-mail adresta: ";
     dataOfAddressee.email = loadLineOfText();
+    cout<<"Podaj adres zamieszakania adresta: ";
+    dataOfAddressee.address = loadLineOfText();
 
     dataOfTheAddressee.push_back(dataOfAddressee);
     cout<<"Adresat zostal utworzony."<<endl;
@@ -218,15 +218,15 @@ void saveToTxtFile(vector<AdressData> dataOfListAddressee)
 
     for(vector<AdressData>::iterator itr = dataOfListAddressee.begin(), endVectorWord=dataOfListAddressee.end(); itr!=endVectorWord; itr++)
     {
-        file<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->surname<<'|'<<itr->name<<'|'<<itr->phoneNumber<<'|'<<itr->address<<'|'<<itr->email<<'|'<<'\n';
+        file<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
     }
 
     file.close();
 }
 
-void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
+void readFromTxtFile(vector<AdressData> &writeToAddresseeList, int idUser)
 {
-    AdressData dataOfAddresseeFromTxtFile;	// wskaznik/bufor na dane adrestata z txt
+    AdressData dataOfAddresseeFromTxtFile;
 
     string lineInTxtFile;
     int numberOfTheLineInTxtFile=1;
@@ -238,7 +238,7 @@ void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
         file.open("Adresaci.txt", ios::in );
     }
 
-    while(getline(file,lineInTxtFile,'|') )
+    while(getline(file,lineInTxtFile,'|'))
     {
         switch(numberOfTheLineInTxtFile)
         {
@@ -249,19 +249,19 @@ void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
             dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
             break;
         case 3:
-            dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.name = lineInTxtFile;
             break;
         case 4:
-            dataOfAddresseeFromTxtFile.name = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
             break;
         case 5:
             dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
             break;
         case 6:
-            dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.email = lineInTxtFile;
             break;
         case 7:
-            dataOfAddresseeFromTxtFile.email = lineInTxtFile;
+            dataOfAddresseeFromTxtFile.address = lineInTxtFile;
             break;
         }
 
@@ -269,10 +269,107 @@ void readFromTxtFile(vector<AdressData> &writeToAddresseeList)
         if(numberOfTheLineInTxtFile==8)
         {
             numberOfTheLineInTxtFile=1;
-            writeToAddresseeList.push_back(dataOfAddresseeFromTxtFile);
+            if(dataOfAddresseeFromTxtFile.idOfUser==idUser)
+            {
+                writeToAddresseeList.push_back(dataOfAddresseeFromTxtFile);
+            }
         }
     }
     file.close();
+}
+
+void enterTheUsersDetails(vector<User> &users)
+{
+
+    User dataOfUser;		// Dane Adresata
+    if(!users.empty())
+        dataOfUser = users.back();
+    else
+        dataOfUser.id=0;
+
+    fstream fileUsers;
+    fileUsers.open("Uzytkownicy.txt", ios::in );
+
+    if (fileUsers.good()==false)
+    {
+        cout<<"Nie udalo sie otworzyc pliku 'Uzytkownicy.txt'!"<<endl;
+        Sleep(3000);
+        fileUsers.open("Uzytkownicy.txt", ios::out );
+        if(fileUsers.good()==true)
+        {
+            cout<<"Zostal utworzony nowy plik 'Uzytkownicy.txt'z baza danych adresatow!"<<endl;
+            Sleep(3000);
+        }
+    }
+    if (fileUsers.good()==false)
+    {
+        cout<<"Nie udalo sie utworzyc pliku ""Uzytkownicy.txt""!"<<endl;
+        Sleep(3000);
+        exit(0);
+    }
+
+    dataOfUser.id = dataOfUser.id + 1;
+    cout<<"Podaj nazwie uzytkownika: ";
+    dataOfUser.userName = loadLineOfText();
+    cout<<"Podaj haslo uzytkownika: ";
+    dataOfUser.password = loadLineOfText();
+
+    users.push_back(dataOfUser);
+    cout<<"User zostal utworzony."<<endl;
+    Sleep(1500);
+
+}
+
+void saveUsersToTxtFile(vector<User> &users)
+{
+    fstream fileUsers;
+    fileUsers.open("Uzytkownicy.txt", ios::out );
+
+    for(vector<User>::iterator itr = users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
+    {
+        fileUsers<<itr->id<<'|'<<itr->userName<<'|'<<itr->password<<'|'<<'\n';
+    }
+
+    fileUsers.close();
+}
+
+void readUsersFromTxtFile(vector<User> &users)
+{
+    User dataOfUser;
+
+    string lineInTxtFile;
+    int numberOfTheLineInTxtFile=1;
+
+    fstream fileUsers;
+
+    if(fileUsers.good()==true)
+    {
+        fileUsers.open("Uzytkownicy.txt", ios::in );
+    }
+
+    while(getline(fileUsers,lineInTxtFile,'|') )
+    {
+        switch(numberOfTheLineInTxtFile)
+        {
+        case 1:
+            dataOfUser.id = atoi(lineInTxtFile.c_str());
+            break;
+        case 2:
+            dataOfUser.userName = lineInTxtFile;
+            break;
+        case 3:
+            dataOfUser.password = lineInTxtFile;
+            break;
+        }
+
+        ++numberOfTheLineInTxtFile;
+        if(numberOfTheLineInTxtFile==4)
+        {
+            numberOfTheLineInTxtFile=1;
+            users.push_back(dataOfUser);
+        }
+    }
+    fileUsers.close();
 }
 
 void searchTheAddresseeByName(vector<AdressData> &AddresseeList)
@@ -287,11 +384,11 @@ void searchTheAddresseeByName(vector<AdressData> &AddresseeList)
         if(itr->name==name)
         {
             cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
-            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Imie adresata: "<<itr->name<<endl;
+            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
-            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"Adres e-mail adresta: "<<itr->email<<endl;
+            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"=========================================================\n";
 
             cout << "Aby wyjsc do menu wcisnij dowolny klawisz oraz potwierdzajac klawisz 'ENTER'!"<<endl;
@@ -312,11 +409,11 @@ void searchTheAddresseeBySurname(vector<AdressData> &AddresseeList)
         if(itr->surname==surname)
         {
             cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
-            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Imie adresata: "<<itr->name<<endl;
+            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
-            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"Adres e-mail adresta: "<<itr->email<<endl;
+            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"=========================================================\n";
 
             cout << "Aby wyjsc do menu wcisnij dowolny klawisz oraz potwierdzajac klawisz 'ENTER'!"<<endl;
@@ -339,11 +436,11 @@ void editAddressee(vector<AdressData> &AddresseeList)
         {
             system("cls");
             cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
-            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Imie adresata: "<<itr->name<<endl;
+            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
-            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"Adres e-mail adresta: "<<itr->email<<endl;
+            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"=========================================================\n";
 
             char menuItem='0';
@@ -354,26 +451,26 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 {
                 case '0':
                 {
-                    cout<<"1.Edytuj nazwisko adresata."<<endl;
-                    cout<<"2.Edytuj imie adresata."<<endl;
+                    cout<<"1.Edytuj imie adresata."<<endl;
+                    cout<<"2.Edytuj nazwisko adresata."<<endl;
                     cout<<"3.Edytuj numer telefonu adresata."<<endl;
-                    cout<<"4.Edytuj adres zamieszakania adresta."<<endl;
-                    cout<<"5.Edytuj adres e-mail adresta."<<endl;
+                    cout<<"4.Edytuj adres e-mail adresta."<<endl;
+                    cout<<"5.Edytuj adres zamieszakania adresta."<<endl;
                     cout<<"6.Wyjscie do Menu glowengo."<<endl;
                     menuItem = loadSign();
                 }
                 break;
                 case '1':
                 {
-                    cout<<"Podaj nazwisko adresata: ";
-                    itr->surname = loadLineOfText();
+                    cout<<"Podaj imie adresata: ";
+                    itr->name = loadLineOfText();
                     menuItem= '0';
                 }
                 break;
                 case '2':
                 {
-                    cout<<"Podaj imie adresata: ";
-                    itr->name = loadLineOfText();
+                    cout<<"Podaj nazwisko adresata: ";
+                    itr->surname = loadLineOfText();
                     menuItem= '0';
                 }
                 break;
@@ -386,15 +483,15 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 break;
                 case '4':
                 {
-                    cout<<"Podaj adres zamieszakania adresta: ";
-                    itr->address = loadLineOfText();
+                    cout<<"Podaj adres e-mail adresta: ";
+                    itr->email = loadLineOfText();
                     menuItem= '0';
                 }
                 break;
                 case '5':
                 {
-                    cout<<"Podaj adres e-mail adresta: ";
-                    itr->email = loadLineOfText();
+                    cout<<"Podaj adres zamieszakania adresta: ";
+                    itr->address = loadLineOfText();
                     menuItem= '0';
                 }
                 break;
@@ -420,7 +517,7 @@ void displayAdresseesId(vector<AdressData> printedVector)
 {
     for(vector<AdressData>::iterator itr = printedVector.begin(), endVectorData=printedVector.end(); itr!=endVectorData; itr++)
     {
-        cout<<"Numer id adresata: "<<itr->idOfAdressee<<", "<<"Nazwisko adresata: "<<itr->surname<<", "<<"Imie adresata: "<<itr->name<<endl;
+        cout<<"Numer id adresata: "<<itr->idOfAdressee<<", "<<"Imie adresata: "<<itr->name<<", "<<"Nazwisko adresata: "<<itr->surname<<endl;
     }
 }
 
@@ -429,11 +526,11 @@ void printingTheVector(vector<AdressData> printedVector)
     for(vector<AdressData>::iterator itr = printedVector.begin(), endVectorData=printedVector.end(); itr!=endVectorData; itr++)
     {
         cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
-        cout<<"Nazwisko adresata: "<<itr->surname<<endl;
         cout<<"Imie adresata: "<<itr->name<<endl;
+        cout<<"Nazwisko adresata: "<<itr->surname<<endl;
         cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
-        cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
         cout<<"Adres e-mail adresta: "<<itr->email<<endl;
+        cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
         cout<<"=========================================================\n";
     }
 }
@@ -451,11 +548,11 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
         if(itr->idOfAdressee==id)
         {
             cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
-            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Imie adresata: "<<itr->name<<endl;
+            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
             cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
-            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"Adres e-mail adresta: "<<itr->email<<endl;
+            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
             cout<<"=========================================================\n";
 
             cout << "Jezeli chcesz usunac adresata o wybranym id:" << itr->idOfAdressee << " " << itr->name << " " << itr->surname <<" "<< "wcisnij klawisz 't'"<<endl;
@@ -486,7 +583,7 @@ int main()
 
     string surname, name;
 
-    readFromTxtFile(listOfAddresse);
+    readUsersFromTxtFile(users);
 
     while(1)
     {
@@ -506,11 +603,13 @@ int main()
             else if(wybor == '2')
             {
                 idUser = logowanie(users);
+                readFromTxtFile(listOfAddresse,idUser);
             }
             else if(wybor == '9')
             {
                 cout<<"Wcisnij enter, aby zamknac program...";
                 cin.get();
+                saveUsersToTxtFile(users);
                 exit(0);
             }
 
@@ -596,6 +695,7 @@ int main()
             case '8':
             {
                 idUser = 0;
+                listOfAddresse.clear();
                 menuItemSelection = '0';
             }
             break;
@@ -604,7 +704,7 @@ int main()
             {
                 cout<<"Wybierz poprawna opcje menu wpisujac poprawna liczbe oraz potwierdzajac klawisz ENTER!";
                 Sleep(2000);
-                menuItemSelection = '0';
+                idUser = 0;
             }
             break;
 
