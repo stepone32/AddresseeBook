@@ -5,6 +5,7 @@
 #include <sstream>
 #include <windows.h>
 #include <algorithm>
+#include <cstdio>
 
 using namespace std;
 
@@ -434,15 +435,6 @@ void editAddressee(vector<AdressData> &AddresseeList)
     {
         if(itr->idOfAdressee==id)
         {
-            system("cls");
-            cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
-            cout<<"Imie adresata: "<<itr->name<<endl;
-            cout<<"Nazwisko adresata: "<<itr->surname<<endl;
-            cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
-            cout<<"Adres e-mail adresta: "<<itr->email<<endl;
-            cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
-            cout<<"=========================================================\n";
-
             char menuItem='0';
 
             while(menuItem!= '7')
@@ -451,6 +443,16 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 {
                 case '0':
                 {
+
+                    system("cls");
+                    cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
+                    cout<<"Imie adresata: "<<itr->name<<endl;
+                    cout<<"Nazwisko adresata: "<<itr->surname<<endl;
+                    cout<<"Numer telefonu adresata: "<<itr->phoneNumber<<endl;
+                    cout<<"Adres e-mail adresta: "<<itr->email<<endl;
+                    cout<<"Adres zamieszakania adresta: "<<itr->address<<endl;
+                    cout<<"=========================================================\n";
+
                     cout<<"1.Edytuj imie adresata."<<endl;
                     cout<<"2.Edytuj nazwisko adresata."<<endl;
                     cout<<"3.Edytuj numer telefonu adresata."<<endl;
@@ -507,11 +509,75 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 break;
                 }
             }
-            cout<<"Adresat zostal edytowany."<<endl;
-            Sleep(1500);
+            ///////////////////////////////////////////////
+
+    AdressData dataOfAddresseeFromTxtFile;
+
+    string lineInTxtFile;
+    int numberOfTheLineInTxtFile=1;
+
+    fstream file, fileTemp;
+    fileTemp.open("Adresaci_tymczasowy.txt", ios::out );
+
+    if(file.good()==true)
+    {
+        file.open("Adresaci.txt", ios::in );
+    }
+
+    while(getline(file,lineInTxtFile,'|'))
+    {
+        switch(numberOfTheLineInTxtFile)
+        {
+        case 1:
+            dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
+
+            break;
+        case 2:
+            dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
+            break;
+        case 3:
+            dataOfAddresseeFromTxtFile.name = lineInTxtFile;
+            break;
+        case 4:
+            dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
+            break;
+        case 5:
+            dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
+            break;
+        case 6:
+            dataOfAddresseeFromTxtFile.email = lineInTxtFile;
+            break;
+        case 7:
+            dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+            break;
+        }
+
+        ++numberOfTheLineInTxtFile;
+        if(numberOfTheLineInTxtFile==8)
+        {
+            numberOfTheLineInTxtFile=1;
+            if(dataOfAddresseeFromTxtFile.idOfAdressee==itr->idOfAdressee)
+            {
+                fileTemp<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
+            }else
+            {
+                fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
+            }
         }
     }
+    file.close();
+    fileTemp.close();
 }
+remove("Adresaci.txt"); // delete file
+rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
+
+            ////////////////////////////////////////////////
+
+
+        }
+        cout<<"Adresat zostal edytowany."<<endl;
+            Sleep(1500);
+    }
 
 void displayAdresseesId(vector<AdressData> printedVector)
 {
@@ -639,7 +705,7 @@ int main()
             case '1':
             {
                 enterTheAddresseeDetails(idUser,listOfAddresse);
-                saveToTxtFile(listOfAddresse);
+                //saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
             break;
@@ -694,9 +760,9 @@ int main()
 
             case '8':
             {
-                idUser = 0;
                 listOfAddresse.clear();
                 menuItemSelection = '0';
+                idUser = 0;
             }
             break;
 
