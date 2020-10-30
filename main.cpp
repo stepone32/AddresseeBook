@@ -77,19 +77,19 @@ int rejestracja(vector<User> &users,int usersCount)
     cout << "Podaj nazwe uzytkownika: ";
     userName=loadLineOfText();
 
-        if(users.empty())
-       {
-            cout << "Podaj haslo: ";
-            password=loadLineOfText();
-            user.userName=userName;
-            user.password=password;
-            user.id=usersCount+1;
-            users.push_back(user);
-            cout << "Konto zalozone." << endl;
-            Sleep(1000);
-       }
-       else if(!users.empty())
-       {
+    if(users.empty())
+    {
+        cout << "Podaj haslo: ";
+        password=loadLineOfText();
+        user.userName=userName;
+        user.password=password;
+        user.id=usersCount+1;
+        users.push_back(user);
+        cout << "Konto zalozone." << endl;
+        Sleep(1000);
+    }
+    else if(!users.empty())
+    {
 
         for(vector<User>::iterator itr = users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
         {
@@ -100,15 +100,15 @@ int rejestracja(vector<User> &users,int usersCount)
                 userName=loadLineOfText();
             }
         }
-            cout << "Podaj haslo: ";
-            password=loadLineOfText();
-            user.userName=userName;
-            user.password=password;
-            user.id=usersCount+1;
-            users.push_back(user);
-            cout << "Konto zalozone." << endl;
-            Sleep(1000);
-       }
+        cout << "Podaj haslo: ";
+        password=loadLineOfText();
+        user.userName=userName;
+        user.password=password;
+        user.id=usersCount+1;
+        users.push_back(user);
+        cout << "Konto zalozone." << endl;
+        Sleep(1000);
+    }
 
     return usersCount+1;
 }
@@ -153,14 +153,14 @@ void zmianaHasla(vector<User> &users,int idUser)
     password=loadLineOfText();
 
     for(vector<User>::iterator itr=users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
+    {
+        if(itr->id==idUser)
         {
-            if(itr->id==idUser)
-            {
-                itr->password=password;
-                cout << "Haslo zostalo zmienione." << endl;
-                Sleep(1500);
-            }
+            itr->password=password;
+            cout << "Haslo zostalo zmienione." << endl;
+            Sleep(1500);
         }
+    }
 }
 
 void enterTheAddresseeDetails(int idUser, vector <AdressData> &dataOfTheAddressee)
@@ -431,6 +431,19 @@ void editAddressee(vector<AdressData> &AddresseeList)
     id = loadIntegerNumber();
     vector<AdressData>::iterator itr = AddresseeList.begin();
 
+    AdressData dataOfAddresseeFromTxtFile;
+
+    string lineInTxtFile;
+    int numberOfTheLineInTxtFile=1;
+
+    fstream file, fileTemp;
+    fileTemp.open("Adresaci_tymczasowy.txt", ios::out );
+
+    if(file.good()==true)
+    {
+        file.open("Adresaci.txt", ios::in );
+    }
+
     for(vector<AdressData>::iterator endVectorWord=AddresseeList.end(); itr!=endVectorWord; itr++)
     {
         if(itr->idOfAdressee==id)
@@ -443,7 +456,6 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 {
                 case '0':
                 {
-
                     system("cls");
                     cout<<"Numer id adresata: "<<itr->idOfAdressee<<endl;
                     cout<<"Imie adresata: "<<itr->name<<endl;
@@ -509,75 +521,58 @@ void editAddressee(vector<AdressData> &AddresseeList)
                 break;
                 }
             }
-            ///////////////////////////////////////////////
 
-    AdressData dataOfAddresseeFromTxtFile;
-
-    string lineInTxtFile;
-    int numberOfTheLineInTxtFile=1;
-
-    fstream file, fileTemp;
-    fileTemp.open("Adresaci_tymczasowy.txt", ios::out );
-
-    if(file.good()==true)
-    {
-        file.open("Adresaci.txt", ios::in );
-    }
-
-    while(getline(file,lineInTxtFile,'|'))
-    {
-        switch(numberOfTheLineInTxtFile)
-        {
-        case 1:
-            dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
-
-            break;
-        case 2:
-            dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
-            break;
-        case 3:
-            dataOfAddresseeFromTxtFile.name = lineInTxtFile;
-            break;
-        case 4:
-            dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
-            break;
-        case 5:
-            dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
-            break;
-        case 6:
-            dataOfAddresseeFromTxtFile.email = lineInTxtFile;
-            break;
-        case 7:
-            dataOfAddresseeFromTxtFile.address = lineInTxtFile;
-            break;
-        }
-
-        ++numberOfTheLineInTxtFile;
-        if(numberOfTheLineInTxtFile==8)
-        {
-            numberOfTheLineInTxtFile=1;
-            if(dataOfAddresseeFromTxtFile.idOfAdressee==itr->idOfAdressee)
+            while(getline(file,lineInTxtFile,'|'))
             {
-                fileTemp<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
-            }else
-            {
-                fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
+                switch(numberOfTheLineInTxtFile)
+                {
+                case 1:
+                    dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
+
+                    break;
+                case 2:
+                    dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
+                    break;
+                case 3:
+                    dataOfAddresseeFromTxtFile.name = lineInTxtFile;
+                    break;
+                case 4:
+                    dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
+                    break;
+                case 5:
+                    dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
+                    break;
+                case 6:
+                    dataOfAddresseeFromTxtFile.email = lineInTxtFile;
+                    break;
+                case 7:
+                    dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+                    break;
+                }
+
+                ++numberOfTheLineInTxtFile;
+                if(numberOfTheLineInTxtFile==8)
+                {
+                    numberOfTheLineInTxtFile=1;
+                    if(dataOfAddresseeFromTxtFile.idOfAdressee==id)
+                    {
+                        fileTemp<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
+                    }
+                    else if(dataOfAddresseeFromTxtFile.idOfAdressee!=id)
+                    {
+                        fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
+                    }
+                }
             }
+            file.close();
+            fileTemp.close();
         }
     }
-    file.close();
-    fileTemp.close();
+    remove("Adresaci.txt"); // delete file
+    rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
+    cout<<"Adresat zostal edytowany."<<endl;
+    Sleep(1500);
 }
-remove("Adresaci.txt"); // delete file
-rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
-
-            ////////////////////////////////////////////////
-
-
-        }
-        cout<<"Adresat zostal edytowany."<<endl;
-            Sleep(1500);
-    }
 
 void displayAdresseesId(vector<AdressData> printedVector)
 {
@@ -608,6 +603,18 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
     cout<<"Podaj id adresata: ";
     id = loadIntegerNumber();
     vector<AdressData>::iterator itr = vectorOfDeleteAddresses.begin();
+    AdressData dataOfAddresseeFromTxtFile;
+
+    string lineInTxtFile;
+    int numberOfTheLineInTxtFile=1;
+
+    fstream file, fileTemp;
+    fileTemp.open("Adresaci_tymczasowy.txt", ios::out );
+
+    if(file.good()==true)
+    {
+        file.open("Adresaci.txt", ios::in );
+    }
 
     for(vector<AdressData>::iterator endVectorWord=vectorOfDeleteAddresses.end(); itr!=endVectorWord; itr++)
     {
@@ -626,6 +633,54 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
             if(loadSign()=='t')
             {
                 vectorOfDeleteAddresses.erase(itr);
+                ///////////////////////////////////////////////
+
+
+
+                while(getline(file,lineInTxtFile,'|'))
+                {
+                    switch(numberOfTheLineInTxtFile)
+                    {
+                    case 1:
+                        dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
+
+                        break;
+                    case 2:
+                        dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
+                        break;
+                    case 3:
+                        dataOfAddresseeFromTxtFile.name = lineInTxtFile;
+                        break;
+                    case 4:
+                        dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
+                        break;
+                    case 5:
+                        dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
+                        break;
+                    case 6:
+                        dataOfAddresseeFromTxtFile.email = lineInTxtFile;
+                        break;
+                    case 7:
+                        dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+                        break;
+                    }
+
+
+                    ++numberOfTheLineInTxtFile;
+                    if(numberOfTheLineInTxtFile==8)
+                    {
+                        numberOfTheLineInTxtFile=1;
+                        if(dataOfAddresseeFromTxtFile.idOfAdressee!=id)
+                        {
+                            fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
+                        }
+                    }
+                }
+                file.close();
+                fileTemp.close();
+
+
+                ////////////////////////////////////////////////
                 cout<< "User o wskazanym id zostal usuniety !"<<endl;
                 Sleep(1500);
             }
@@ -635,6 +690,9 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
             }
         }
     }
+    remove("Adresaci.txt"); // delete file
+    rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
+
 }
 
 int main()
@@ -675,7 +733,7 @@ int main()
             {
                 cout<<"Wcisnij enter, aby zamknac program...";
                 cin.get();
-                saveUsersToTxtFile(users);
+                //saveUsersToTxtFile(users);
                 exit(0);
             }
 
@@ -737,7 +795,7 @@ int main()
             {
                 displayAdresseesId(listOfAddresse);
                 eraseAdressee(listOfAddresse);
-                saveToTxtFile(listOfAddresse);
+                //saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
             break;
@@ -746,7 +804,7 @@ int main()
             {
                 displayAdresseesId(listOfAddresse);
                 editAddressee(listOfAddresse);
-                saveToTxtFile(listOfAddresse);
+                //saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
             break;
