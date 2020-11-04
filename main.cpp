@@ -23,7 +23,7 @@ struct AdressData
 
 struct User
 {
-    int id;
+    int idOfUser;
     string userName, password;
 };
 
@@ -70,7 +70,7 @@ int loadIntegerNumber()
     return number;
 }
 
-int rejestracja(vector<User> &users,int usersCount)
+int userRegistration(vector<User> &users,int usersCount)
 {
     User user;
     string userName, password;
@@ -83,7 +83,7 @@ int rejestracja(vector<User> &users,int usersCount)
         password=loadLineOfText();
         user.userName=userName;
         user.password=password;
-        user.id=usersCount+1;
+        user.idOfUser=usersCount+1;
         users.push_back(user);
         cout << "Konto zalozone." << endl;
         Sleep(1000);
@@ -104,7 +104,7 @@ int rejestracja(vector<User> &users,int usersCount)
         password=loadLineOfText();
         user.userName=userName;
         user.password=password;
-        user.id=usersCount+1;
+        user.idOfUser=usersCount+1;
         users.push_back(user);
         cout << "Konto zalozone." << endl;
         Sleep(1000);
@@ -113,7 +113,7 @@ int rejestracja(vector<User> &users,int usersCount)
     return usersCount+1;
 }
 
-int logowanie(vector<User> users)
+int logging(vector<User> users)
 {
     User userLog;
     string userName, password;
@@ -132,7 +132,7 @@ int logowanie(vector<User> users)
                 {
                     cout << "Zalogowales sie.";
                     Sleep(1000);
-                    return (itr->id);
+                    return (itr->idOfUser);
                 }
             }
             cout << "Podales 3 razy bledne haslo. Poczekaj 3 sekundy przed kolejna proba.";
@@ -146,7 +146,7 @@ int logowanie(vector<User> users)
     return 0;
 }
 
-void zmianaHasla(vector<User> &users,int idUser)
+void passwordChange(vector<User> &users,int idUser)
 {
     string password;
     cout << "Podaj haslo:";
@@ -154,7 +154,7 @@ void zmianaHasla(vector<User> &users,int idUser)
 
     for(vector<User>::iterator itr=users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
     {
-        if(itr->id==idUser)
+        if(itr->idOfUser==idUser)
         {
             itr->password=password;
             cout << "Haslo zostalo zmienione." << endl;
@@ -212,7 +212,7 @@ void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee, int idUse
 
 }
 
-void saveToTxtFile(vector<AdressData> dataOfListAddressee)
+void saveAddedAddresseeToTxtFile(vector<AdressData> dataOfListAddressee)
 {
     fstream file;
     file.open("Adresaci.txt", ios::out|ios::app );
@@ -223,7 +223,7 @@ void saveToTxtFile(vector<AdressData> dataOfListAddressee)
     file.close();
 }
 
-void savingAddresseeToTxt(vector<AdressData> &AddresseeList, int id)
+void saveAddresseesViaTempTxtFile(vector<AdressData> &AddresseeList, int id)
 {
 
     vector<AdressData>::iterator itr = AddresseeList.begin();
@@ -356,7 +356,7 @@ void enterTheUsersDetails(vector<User> &users)
     if(!users.empty())
         dataOfUser = users.back();
     else
-        dataOfUser.id=0;
+        dataOfUser.idOfUser=0;
 
     fstream fileUsers;
     fileUsers.open("Uzytkownicy.txt", ios::in );
@@ -379,7 +379,7 @@ void enterTheUsersDetails(vector<User> &users)
         exit(0);
     }
 
-    dataOfUser.id = dataOfUser.id + 1;
+    dataOfUser.idOfUser = dataOfUser.idOfUser + 1;
     cout<<"Podaj nazwie uzytkownika: ";
     dataOfUser.userName = loadLineOfText();
     cout<<"Podaj haslo uzytkownika: ";
@@ -398,7 +398,7 @@ void saveUsersToTxtFile(vector<User> &users)
 
     for(vector<User>::iterator itr = users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
     {
-        fileUsers<<itr->id<<'|'<<itr->userName<<'|'<<itr->password<<'|'<<'\n';
+        fileUsers<<itr->idOfUser<<'|'<<itr->userName<<'|'<<itr->password<<'|'<<'\n';
     }
 
     fileUsers.close();
@@ -423,7 +423,7 @@ void readUsersFromTxtFile(vector<User> &users)
         switch(numberOfTheLineInTxtFile)
         {
         case 1:
-            dataOfUser.id = atoi(lineInTxtFile.c_str());
+            dataOfUser.idOfUser = atoi(lineInTxtFile.c_str());
             break;
         case 2:
             dataOfUser.userName = lineInTxtFile;
@@ -503,7 +503,6 @@ void editAddressee(vector<AdressData> &AddresseeList, int &id)
     AdressData dataOfAddresseeFromTxtFile;
 
     string lineInTxtFile;
-    int numberOfTheLineInTxtFile=1;
 
     for(vector<AdressData>::iterator endVectorWord=AddresseeList.end(); itr!=endVectorWord; itr++)
     {
@@ -665,7 +664,7 @@ int main()
     vector<User> users;
     int id=0;
     int idUser=0;
-    int iloscUzytkownikow=0;
+    int numberOfUsers=0;
 
     char wybor;
     char menuItemSelection = '0';
@@ -687,11 +686,11 @@ int main()
 
             if(wybor == '1')
             {
-                iloscUzytkownikow = rejestracja(users,iloscUzytkownikow);
+                numberOfUsers = userRegistration(users,numberOfUsers);
             }
             else if(wybor == '2')
             {
-                idUser = logowanie(users);
+                idUser = logging(users);
                 readFromTxtFile(listOfAddresse,idUser);
             }
             else if(wybor == '9')
@@ -727,7 +726,7 @@ int main()
             case '1':
             {
                 enterTheAddresseeDetails(listOfAddresse,idUser);
-                saveToTxtFile(listOfAddresse);
+                saveAddedAddresseeToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
             break;
@@ -759,7 +758,7 @@ int main()
             {
                 displayAdresseesId(listOfAddresse);
                 eraseAdressee(listOfAddresse,id);
-                savingAddresseeToTxt(listOfAddresse,id);
+                saveAddresseesViaTempTxtFile(listOfAddresse,id);
                 menuItemSelection = '0';
             }
             break;
@@ -768,15 +767,14 @@ int main()
             {
                 displayAdresseesId(listOfAddresse);
                 editAddressee(listOfAddresse,id);
-                savingAddresseeToTxt(listOfAddresse,id);
-                //saveToTxtFile(listOfAddresse);
+                saveAddresseesViaTempTxtFile(listOfAddresse,id);
                 menuItemSelection = '0';
             }
             break;
 
             case '7':
             {
-                zmianaHasla(users,idUser);
+                passwordChange(users,idUser);
                 menuItemSelection = '0';
             }
             break;
