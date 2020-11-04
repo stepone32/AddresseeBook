@@ -163,7 +163,7 @@ void zmianaHasla(vector<User> &users,int idUser)
     }
 }
 
-void enterTheAddresseeDetails(int idUser, vector <AdressData> &dataOfTheAddressee)
+void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee, int idUser)
 {
 
     AdressData dataOfAddressee;		// Dane Adresata
@@ -215,17 +215,15 @@ void enterTheAddresseeDetails(int idUser, vector <AdressData> &dataOfTheAddresse
 void saveToTxtFile(vector<AdressData> dataOfListAddressee)
 {
     fstream file;
-    file.open("Adresaci.txt", ios::out );
+    file.open("Adresaci.txt", ios::out|ios::app );
+    AdressData dataOfAddressee = dataOfListAddressee.back();
 
-    for(vector<AdressData>::iterator itr = dataOfListAddressee.begin(), endVectorWord=dataOfListAddressee.end(); itr!=endVectorWord; itr++)
-    {
-        file<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
-    }
+    file<<dataOfAddressee.idOfAdressee<<'|'<<dataOfAddressee.idOfUser<<'|'<<dataOfAddressee.name<<'|'<<dataOfAddressee.surname<<'|'<<dataOfAddressee.phoneNumber<<'|'<<dataOfAddressee.email<<'|'<<dataOfAddressee.address<<'|'<<'\n';
 
     file.close();
 }
 
-void savingAddresseeToTxt(vector<AdressData> &AddresseeList)
+void savingAddresseeToTxt(vector<AdressData> &AddresseeList, int id)
 {
 
     vector<AdressData>::iterator itr = AddresseeList.begin();
@@ -281,10 +279,11 @@ void savingAddresseeToTxt(vector<AdressData> &AddresseeList)
                     {
                         fileTemp<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
                     }
-                    else if(dataOfAddresseeFromTxtFile.idOfAdressee!=itr->idOfAdressee)
+                    if(dataOfAddresseeFromTxtFile.idOfAdressee!=itr->idOfAdressee&&dataOfAddresseeFromTxtFile.idOfAdressee!=id)
                     {
                         fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
                     }
+
                 }
             }
             file.close();
@@ -494,9 +493,8 @@ void searchTheAddresseeBySurname(vector<AdressData> &AddresseeList)
     }
 }
 
-void editAddressee(vector<AdressData> &AddresseeList)
+void editAddressee(vector<AdressData> &AddresseeList, int &id)
 {
-    int id;
 
     cout<<"Podaj id adresata: ";
     id = loadIntegerNumber();
@@ -613,10 +611,9 @@ void printingTheVector(vector<AdressData> printedVector)
     }
 }
 
-void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses)
+void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses, int &id)
 {
-    int id;
-    //system("cls");
+
     cout<<"Podaj id adresata: ";
     id = loadIntegerNumber();
     vector<AdressData>::iterator itr = vectorOfDeleteAddresses.begin();
@@ -666,6 +663,7 @@ int main()
 {
     vector<AdressData> listOfAddresse;
     vector<User> users;
+    int id=0;
     int idUser=0;
     int iloscUzytkownikow=0;
 
@@ -700,7 +698,6 @@ int main()
             {
                 cout<<"Wcisnij enter, aby zamknac program...";
                 cin.get();
-                //saveUsersToTxtFile(users);
                 exit(0);
             }
 
@@ -729,9 +726,8 @@ int main()
 
             case '1':
             {
-                enterTheAddresseeDetails(idUser,listOfAddresse);
-                savingAddresseeToTxt(listOfAddresse);
-                //saveToTxtFile(listOfAddresse);
+                enterTheAddresseeDetails(listOfAddresse,idUser);
+                saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
             break;
@@ -762,9 +758,8 @@ int main()
             case '5':
             {
                 displayAdresseesId(listOfAddresse);
-                eraseAdressee(listOfAddresse);
-                savingAddresseeToTxt(listOfAddresse);
-                //saveToTxtFile(listOfAddresse);
+                eraseAdressee(listOfAddresse,id);
+                savingAddresseeToTxt(listOfAddresse,id);
                 menuItemSelection = '0';
             }
             break;
@@ -772,8 +767,8 @@ int main()
             case '6':
             {
                 displayAdresseesId(listOfAddresse);
-                editAddressee(listOfAddresse);
-                savingAddresseeToTxt(listOfAddresse);
+                editAddressee(listOfAddresse,id);
+                savingAddresseeToTxt(listOfAddresse,id);
                 //saveToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
