@@ -9,7 +9,6 @@
 
 using namespace std;
 
-
 struct AdressData
 {
     int     idOfAdressee;
@@ -90,10 +89,8 @@ int userRegistration(vector<User> &users,int usersCount)
     }
     else if(!users.empty())
     {
-
         for(vector<User>::iterator itr = users.begin(), endVectorWord=users.end(); itr!=endVectorWord; itr++)
         {
-
             if(itr->userName == userName)
             {
                 cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
@@ -163,7 +160,7 @@ void passwordChange(vector<User> &users,int idUser)
     }
 }
 
-void enterTheAddresseeDetails(vector <AdressData> &dataOfTheAddressee, int idUser)
+void enterNewAddressDetails(vector <AdressData> &dataOfTheAddressee, int idUser)
 {
 
     AdressData dataOfAddressee;		// Dane Adresata
@@ -243,52 +240,50 @@ void saveAddresseesViaTempTxtFile(vector<AdressData> &AddresseeList, int id)
 
     for(vector<AdressData>::iterator endVectorWord=AddresseeList.end(); itr!=endVectorWord; itr++)
     {
-
-            while(getline(file,lineInTxtFile,'|'))
+        while(getline(file,lineInTxtFile,'|'))
+        {
+            switch(numberOfTheLineInTxtFile)
             {
-                switch(numberOfTheLineInTxtFile)
+            case 1:
+                dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
+                break;
+            case 2:
+                dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
+                break;
+            case 3:
+                dataOfAddresseeFromTxtFile.name = lineInTxtFile;
+                break;
+            case 4:
+                dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
+                break;
+            case 5:
+                dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
+                break;
+            case 6:
+                dataOfAddresseeFromTxtFile.email = lineInTxtFile;
+                break;
+            case 7:
+                dataOfAddresseeFromTxtFile.address = lineInTxtFile;
+                break;
+            }
+
+            ++numberOfTheLineInTxtFile;
+            if(numberOfTheLineInTxtFile==8)
+            {
+                numberOfTheLineInTxtFile=1;
+                if(dataOfAddresseeFromTxtFile.idOfAdressee==itr->idOfAdressee)
                 {
-                case 1:
-                    dataOfAddresseeFromTxtFile.idOfAdressee=atoi(lineInTxtFile.c_str());
-                    break;
-                case 2:
-                    dataOfAddresseeFromTxtFile.idOfUser=atoi(lineInTxtFile.c_str());
-                    break;
-                case 3:
-                    dataOfAddresseeFromTxtFile.name = lineInTxtFile;
-                    break;
-                case 4:
-                    dataOfAddresseeFromTxtFile.surname = lineInTxtFile;
-                    break;
-                case 5:
-                    dataOfAddresseeFromTxtFile.phoneNumber = lineInTxtFile;
-                    break;
-                case 6:
-                    dataOfAddresseeFromTxtFile.email = lineInTxtFile;
-                    break;
-                case 7:
-                    dataOfAddresseeFromTxtFile.address = lineInTxtFile;
-                    break;
+                    fileTemp<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
                 }
-
-                ++numberOfTheLineInTxtFile;
-                if(numberOfTheLineInTxtFile==8)
+                if(dataOfAddresseeFromTxtFile.idOfAdressee!=itr->idOfAdressee&&dataOfAddresseeFromTxtFile.idOfAdressee!=id)
                 {
-                    numberOfTheLineInTxtFile=1;
-                    if(dataOfAddresseeFromTxtFile.idOfAdressee==itr->idOfAdressee)
-                    {
-                        fileTemp<<itr->idOfAdressee<<'|'<<itr->idOfUser<<'|'<<itr->name<<'|'<<itr->surname<<'|'<<itr->phoneNumber<<'|'<<itr->email<<'|'<<itr->address<<'|'<<'\n';
-                    }
-                    if(dataOfAddresseeFromTxtFile.idOfAdressee!=itr->idOfAdressee&&dataOfAddresseeFromTxtFile.idOfAdressee!=id)
-                    {
-                        fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
-                    }
-
+                    fileTemp<<dataOfAddresseeFromTxtFile.idOfAdressee<<'|'<<dataOfAddresseeFromTxtFile.idOfUser<<'|'<<dataOfAddresseeFromTxtFile.name<<'|'<<dataOfAddresseeFromTxtFile.surname<<'|'<<dataOfAddresseeFromTxtFile.phoneNumber<<'|'<<dataOfAddresseeFromTxtFile.email<<'|'<<dataOfAddresseeFromTxtFile.address<<'|'<<'\n';
                 }
             }
-            file.close();
-            fileTemp.close();
         }
+        file.close();
+        fileTemp.close();
+    }
 
     remove("Adresaci.txt"); // delete file
     rename("Adresaci_tymczasowy.txt", "Adresaci.txt");
@@ -615,13 +610,12 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses, int &id)
 
     cout<<"Podaj id adresata: ";
     id = loadIntegerNumber();
+
     vector<AdressData>::iterator itr = vectorOfDeleteAddresses.begin();
     AdressData dataOfAddresseeFromTxtFile;
-
     string lineInTxtFile;
-    int numberOfTheLineInTxtFile=1;
-
     fstream file, fileTemp;
+
     fileTemp.open("Adresaci_tymczasowy.txt", ios::out );
 
     if(file.good()==true)
@@ -655,7 +649,6 @@ void eraseAdressee(vector<AdressData> &vectorOfDeleteAddresses, int &id)
             }
         }
     }
-
 }
 
 int main()
@@ -699,7 +692,6 @@ int main()
                 cin.get();
                 exit(0);
             }
-
         }
         else
         {
@@ -725,7 +717,7 @@ int main()
 
             case '1':
             {
-                enterTheAddresseeDetails(listOfAddresse,idUser);
+                enterNewAddressDetails(listOfAddresse,idUser);
                 saveAddedAddresseeToTxtFile(listOfAddresse);
                 menuItemSelection = '0';
             }
